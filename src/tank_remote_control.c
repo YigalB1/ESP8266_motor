@@ -1,33 +1,25 @@
 // TND - justy copied hre. "controller" sends the data, so it will be used for the remote control.
+// ESP32 because we need 2 analog inputs for the joystick
+#include "esp_now.h"
 
 
-/****************************************************
- *  TITLE: ESP-NOW Controller + Ultrasonic sensor
- *  source: https://youtu.be/_cNAsTB5JpM
- *  Board Settings:
- *  Board: "ESP8266 or WeMos D1 R1 or Mini"
- ****************************************************
- */
-
-#include<ESP8266WiFi.h>
-#include<espnow.h>
-
-#define MY_NAME         "CONTROLLER_NODE"
-#define MY_ROLE         ESP_NOW_ROLE_CONTROLLER         // set the role of this device: CONTROLLER, SLAVE, COMBO
-#define RECEIVER_ROLE   ESP_NOW_ROLE_SLAVE              // set the role of the receiver
+#define MY_NAME         "REMOTE_CONTROL"
+#define MY_ROLE         ESP_NOW_ROLE_REMMOTE_CONTROLE         // set the role of this device: CONTROLLER, SLAVE, COMBO
+#define RECEIVER_ROLE   ESP_NOW_ROLE_TANK              // set the role of the receiver
 #define WIFI_CHANNEL    1
 
-const int sensor_name = 0;  // 0 for left, 1 for right
-const int trigP = 16;   //D0 Or GPIO-16 of nodemcu
-const int echoP = 5;    //D1 Or GPIO-5 of nodemcu
-const int led_2nd = 2;  //D4 Or GPIO-2 of nodemcu
 
-int distance;
+
+const int SW_pin = 2; // digital pin connected to switch output
+const int X_pin = 36; // analog pin connected to X output
+const int Y_pin = 39; // analog pin connected to Y output
+
 uint8_t receiverAddress[] = {0xEC, 0xFA, 0xBC, 0xC3, 0x01, 0xA0};   // please update this with the MAC address of the receiver
 
 struct __attribute__((packed)) dataPacket {
-  int sensor_name;
-  int sensor_dist;
+  int tank_command; // commands: 0-stop,1-move
+  int command_X_value;
+  int command_Y_value;
 };
 
 void transmissionComplete(uint8_t *receiver_mac, uint8_t transmissionStatus) {
@@ -56,13 +48,7 @@ int measure_dist(int _trig,int _echo)
 }
 
 void setup() {
-  pinMode(2, OUTPUT);     // GPIO2 (D4) led on ESP8266 module (in addition to onboard led on GPIO 16)
-  // on board led is GPIO16 (D0)
-  pinMode(trigP, OUTPUT);  // Sets the trigPin as an Output
-  pinMode(echoP, INPUT);   // Sets the echoPin as an Input
-
-  Serial.begin(9600);     // initialize serial port
-  
+  Serial.begin(9600);     // initialize serial por
   Serial.println();
   Serial.print("Initializing...");
   Serial.print(MY_NAME);
