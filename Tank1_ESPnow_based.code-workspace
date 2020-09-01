@@ -2,6 +2,10 @@
     "folders": [
         {
             "path": "."
+        },
+        {
+            "name": "Tank_ESPnow_remote_control",
+            "path": "Tank_ESPnow_remote_control"
         }
     ]
 }
