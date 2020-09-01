@@ -60,6 +60,7 @@ void loop() {
   delay(200);
   int X_Value = analogRead(X_pin);
   int Y_Value = analogRead(Y_pin);
+  int stam; // no need
   
   int map_X = map(X_Value, 0, 1023, -512, 512);
   int map_Y = map(Y_Value, 0, 1023, -512, 512);
@@ -70,7 +71,7 @@ void loop() {
   packet.X_value = map_X;
   packet.Y_value = map_Y;
 
-  Serial.print("Sending: ");
+  Serial.print("Sending:  ");
   Serial.print(map_X);
   Serial.print(" /  ");
   Serial.println(map_Y);
