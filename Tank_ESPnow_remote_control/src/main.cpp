@@ -11,7 +11,7 @@
 
 
 
-const int SW_pin = 2; // digital pin connected to switch output
+//const int SW_pin = 2; // digital pin connected to switch output
 const int X_pin = 34; // analog pin connected to X output
 const int Y_pin = 35; // analog pin connected to Y output
 
@@ -34,6 +34,12 @@ void transmissionComplete(uint8_t *receiver_mac, uint8_t transmissionStatus) {
 
 
 void setup() {
+  pinMode(LED_BUILTIN,OUTPUT);
+  pinMode(X_pin, INPUT);
+  pinMode(Y_pin, INPUT);
+
+
+
   Serial.begin(9600);     // initialize serial por
   Serial.println();
   Serial.print("Initializing...");
@@ -58,25 +64,29 @@ Serial.println("Initialized.");
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   delay(200);
-  int X_Value = analogRead(X_pin);
-  int Y_Value = analogRead(Y_pin);
-  int stam; // no need
+  int rd_X = analogRead(X_pin);
+  int rd_Y = analogRead(Y_pin);
+  //int stam; // no need
   
-  int map_X = map(X_Value, 0, 1023, -512, 512);
-  int map_Y = map(Y_Value, 0, 1023, -512, 512);
+  int map_X = map(rd_X, 0, 4096, -512, 512);
+  int map_Y = map(rd_Y, 0, 4096, -512, 512);
 
 
   dataPacket packet;
-  
   packet.X_value = map_X;
   packet.Y_value = map_Y;
 
   Serial.print("Sending:  ");
+  Serial.print(rd_X);
+  Serial.print(" /  ");
+  Serial.print(rd_Y);
+  Serial.print(" ...... ");
   Serial.print(map_X);
   Serial.print(" /  ");
-  Serial.println(map_Y);
+  Serial.print(map_Y);
+  Serial.print("  ");
 
   esp_now_send(tank_rcv_Addr, (uint8_t *) &packet, sizeof(packet));
   digitalWrite(LED_BUILTIN, LOW);
-  delay(400);
+  delay(1400);
 }
