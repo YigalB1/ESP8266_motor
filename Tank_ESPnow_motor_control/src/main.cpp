@@ -1,52 +1,19 @@
-// TBD - should drive motor control from ESO NOW protocol
-
 //#include <Arduino.h>
 
-/****************************************************************************************************************************************************
- *  TITLE: ESP-NOW Getting Started Examples
- *
- *  By Frenoy Osburn
- *  YouTube Video: https://youtu.be/_cNAsTB5JpM
- ****************************************************************************************************************************************************/
-
- /********************************************************************************************************************
-  * Please make sure that you install the board support package for the ESP8266 boards.
-  * You will need to add the following URL to your Arduino preferences.
-  * Boards Manager URL: http://arduino.esp8266.com/stable/package_esp8266com_index.json
- ********************************************************************************************************************/
+// ****************************************************
+// from: YouTube Video: https://youtu.be/_cNAsTB5JpM
+// ****************************************************
  
- /********************************************************************************************************************
- *  Board Settings:
- *  Board: "WeMos D1 R1 or Mini"
- *  Upload Speed: "921600"
- *  CPU Frequency: "80MHz"
- *  Flash Size: "4MB (FS:@MB OTA:~1019KB)"
- *  Debug Port: "Disabled"
- *  Debug Level: "None"
- *  VTables: "Flash"
- *  IwIP Variant: "v2 Lower Memory"
- *  Exception: "Legacy (new can return nullptr)"
- *  Erase Flash: "Only Sketch"
- *  SSL Support: "All SSL ciphers (most compatible)"
- *  COM Port: Depends *On Your System*
- *********************************************************************************************************************/
- #include<ESP8266WiFi.h>
+#include<ESP8266WiFi.h>
 #include<espnow.h>
 
-#define MY_NAME   "SLAVE_NODE"
+#define MY_NAME   "Tank Motor cintroller"
 
 struct __attribute__((packed)) dataPacket {
-  int sensor_name;
-  int sensor_dist;
+  int tank_command; // commands: 0-stop,1-move
+  int X_value;
+  int Y_value;
 };
-
-/*
-struct __attribute__((packed)) dataPacket {
-  int sensor1;
-  int sensor2;
-  float sensor3;
-};
-*/
 
 
 void dataReceived(uint8_t *senderMac, uint8_t *data, uint8_t dataLength) {
@@ -62,9 +29,9 @@ void dataReceived(uint8_t *senderMac, uint8_t *data, uint8_t dataLength) {
   memcpy(&packet, data, sizeof(packet));
   
   Serial.print("sensor: ");
-  Serial.print(packet.sensor_name);
-  Serial.print("  distance: ");
-  Serial.println(packet.sensor_dist);
+  Serial.print(packet.X_value);
+  Serial.print("  / ");
+  Serial.println(packet.Y_value);
 }
  
 void setup() {
@@ -72,11 +39,9 @@ void setup() {
   Serial.begin(9600);     // initialize serial port
 
   Serial.println();
-  Serial.println();
-  Serial.println();
   Serial.print("Initializing...");
-  Serial.println(MY_NAME);
-  Serial.print("My MAC address is: ");
+  Serial.print(MY_NAME);
+  Serial.print("  My MAC address is: ");
   Serial.println(WiFi.macAddress());
 
   WiFi.mode(WIFI_STA);
